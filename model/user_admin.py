@@ -1,4 +1,3 @@
-from model import database as db
 class user_admin:
     def __init__(self):
         pass
@@ -8,5 +7,5 @@ class user_admin:
 
         hasil = db.get_data(query, values)
 
-        return hasil
+        return hasil()
 
