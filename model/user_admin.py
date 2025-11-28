@@ -1,11 +1,9 @@
-class user_admin:
-    def __init__(self):
-        pass
-    def panggil_user(self, username, password):
-        query = "SELECT * FROM admin WHERE username = %s AND password = %s"
-        values = (username, password)
-
-        hasil = db.get_data(query, values)
-
-        return hasil()
+class user_admin: 
+    def __init__(self): 
+        pass 
+    def panggil_user(self, username, password): 
+        if username == "RAFID" and password == "170307": 
+            return ["OK", username, "Admin"] 
+        else: 
+            return []
 

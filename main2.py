@@ -7,7 +7,7 @@ user_model = us.user_admin()
 class MainApp:
     def __init__(self, root):   
         self.root = root
-        self.root.title("Login")
+        self.root.title("Data Inventory")
         self.root.geometry("480x210")
 
         self.label = ttk.Label(root, text="Username")
