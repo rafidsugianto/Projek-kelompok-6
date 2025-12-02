@@ -1,10 +1,10 @@
-import mysql.connector 
+import mysql.connector
 
 def connect():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="",   
+        password="",
         database="database_toko"
     )
 
@@ -24,6 +24,3 @@ def get_data(query, values=None):
     cursor.close()
     db.close()
     return result
-
-db = connect()
-cursor = db.cursor()
