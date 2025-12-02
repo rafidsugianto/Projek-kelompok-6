@@ -1,4 +1,4 @@
-from model import database as db
+from database import db
 
 class kategori:
     def __init__(self, nama_kategori, kode_kategori):

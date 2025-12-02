@@ -1,4 +1,4 @@
-from database import db
+from model import database as db
 
 class barang:
     def __init__(self, nama_barang, kategori_barang, kode_barang):
