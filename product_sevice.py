@@ -1,4 +1,4 @@
-from database import database_toko
+from database import 
 
 class ProductService:
     def fetchProducts(self):
