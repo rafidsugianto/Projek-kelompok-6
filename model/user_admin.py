@@ -1,10 +1,6 @@
 import database
 
 
-
-
-
-
 class DataUser:
     def __init__(self, username_admin, password_admin):
         self.username_admin = username_admin

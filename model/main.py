@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-
+from database import check_login
+from database import get_barang
 
 class MainApp:
     def __init__(self, root):
@@ -9,22 +10,15 @@ class MainApp:
         self.root.title("Data Inventory")
         self.root.geometry("1000x700")
 
-        # warma default
-        self.GRAY_BG = "#2A1F3D"
-        self.LIGHT_BG = "#F1F1F1"
-        self.TEXT_COLOR = "black"
-
-        # --- HALAMAN LOGIN ---
         self.login_screen()
 
+    def clear_window(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-    # ==========================================================
-    #	SCREEN: LOGIN
-    # ==========================================================
     def login_screen(self):
         self.clear_window()
 
-        # Title
         ttk.Label(self.root, text="Username", font=("Arial", 14)).pack(pady=20)
         self.entry_username = ttk.Entry(self.root, width=30)
         self.entry_username.pack()
@@ -38,128 +32,161 @@ class MainApp:
                    width=20,
                    command=self.proses_login).pack(pady=20)
 
-
     def proses_login(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
 
-        if username == "admin" and password == "123":
+        if check_login(username, password):
             messagebox.showinfo("Success", f"Login berhasil sebagai {username}")
             self.admin_login()
         else:
             messagebox.showerror("Error", "Username atau password salah")
 
-
-    #	SCREEN: MENU ADMIN
     def admin_login(self):
         self.clear_window()
-        self.root.title("Admin Panel")
-        self.root.configure(bg=self.GRAY_BG)
 
-        Frame(self.root, height=40, bg=self.GRAY_BG).pack()
-
-        ttk.Label(self.root,
-                  text="MENU ADMIN INVENTORY",
-                  font=("Arial", 18)).pack(pady=10)
+        ttk.Label(self.root, text="Dashboard Admin", font=("Arial", 18)).pack(pady=20)
 
         ttk.Button(self.root,
                    text="Lihat Barang",
-                   width=25,
+                   width=20,
                    command=self.lihat_barang).pack(pady=10)
 
         ttk.Button(self.root,
-                   text="Exit",
-                   width=25,
-                   command=self.root.quit).pack(pady=10)
+                   text="Logout",
+                   width=20,
+                   command=self.login_screen).pack(pady=10)
 
-
-    # ==========================================================
-    #	SCREEN: LIHAT BARANG (TABEL)
-    # ==========================================================
     def lihat_barang(self):
         self.clear_window()
 
-        self.root.title("Daftar Barang")
-        self.root.configure(bg=self.LIGHT_BG)
+        ttk.Label(self.root, text="Data Barang", font=("Arial", 18)).pack(pady=10)
+        ttk.Button(
+        self.root,
+        text="Tambah Barang",
+        width=20,
+        command=self.form_add_barang
+        ).pack(pady=5)
 
-        Frame(self.root, height=15, bg=self.LIGHT_BG).pack()
+        ttk.Button(
+        self.root,
+        text="Hapus Barang",
+        width=20,
+        command=self.hapus_barang
+        ).pack(pady=5)
 
-        ttk.Label(self.root,
-                  text="Data Barang",
-                  font=("Arial", 18)).pack(pady=10)
-
-        # Tombol back
         ttk.Button(self.root,
                    text="← Kembali",
                    width=20,
                    command=self.admin_login).pack(pady=10)
 
-        # Container tabel
         container = Frame(self.root)
         container.pack(fill=BOTH, expand=True, padx=20, pady=20)
 
-        # Scrollbar
         scrollbar = ttk.Scrollbar(container, orient=VERTICAL)
 
-        # Treeview
         self.tableBarang = ttk.Treeview(
-            container,
-            columns=("No", "Nama", "Stok", "Harga"),
-            show="headings",
-            yscrollcommand=scrollbar.set,
-            height=15
-        )
+        container,
+        columns=("nama_barang", "kategori_barang", "kode_barang"),
+        show="headings"
+)
 
         scrollbar.config(command=self.tableBarang.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
 
-        # Header kolom
-        self.tableBarang.heading("No", text="ID")
-        self.tableBarang.heading("Nama", text="Nama Barang")
-        self.tableBarang.heading("Stok", text="Stok")
-        self.tableBarang.heading("Harga", text="Harga")
+        self.tableBarang.heading("nama_barang", text="nama")
+        self.tableBarang.heading("kategori_barang", text="kategori")
+        self.tableBarang.heading("kode_barang", text="kode")
 
-        # Lebar kolom
-        self.tableBarang.column("No", width=50, anchor="center")
-        self.tableBarang.column("Nama", width=250)
-        self.tableBarang.column("Stok", width=100, anchor="center")
-        self.tableBarang.column("Harga", width=150, anchor="center")
+        self.tableBarang.column("nama_barang", width=250)
+        self.tableBarang.column("kategori_barang", width=100, anchor="center")
+        self.tableBarang.column("kode_barang", width=150, anchor="center")
 
         self.tableBarang.pack(fill=BOTH, expand=True)
 
-        # load data
         self.load_data_barang()
 
-
-    # ==========================================================
-    #	FUNGSI LOAD DATA BARANG
-    # ==========================================================
     def load_data_barang(self):
 
-        # data dummy contoh
-        data = [
-            (1, "Kabel HDMI", 10, "Rp 45.000"),
-            (2, "Mouse Wireless", 25, "Rp 70.000"),
-            (3, "Keyboard Mechanical", 8, "Rp 350.000"),
-            (4, "Flashdisk 64GB", 22, "Rp 95.000"),
-        ]
+        for row in self.tableBarang.get_children():
+            self.tableBarang.delete(row)
 
-        # masukkan data ke tabel
+        data = get_barang()
+
         for item in data:
             self.tableBarang.insert("", END, values=item)
 
 
-    # ==========================================================
-    #	FUNGSI CLEAR WINDOW
-    # ==========================================================
-    def clear_window(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
+    def form_add_barang(self):
+        win = Toplevel(self.root)
+        win.title("Tambah Barang")
+        win.geometry("350x300")
+
+        ttk.Label(win, text="Nama Barang").pack(pady=5)
+        entry_nama = ttk.Entry(win)
+        entry_nama.pack()
+
+        ttk.Label(win, text="Kategori").pack(pady=5)
+        entry_kategori = ttk.Entry(win)
+        entry_kategori.pack()
+
+        ttk.Label(win, text="Kode Barang").pack(pady=5)
+        entry_kode = ttk.Entry(win)
+        entry_kode.pack()
+
+        ttk.Button(
+            win,
+            text="Simpan",
+            command=lambda: self.simpan_barang(
+                entry_nama.get(),
+                entry_kategori.get(),
+                entry_kode.get(),
+                win
+            )
+        ).pack(pady=20)
+
+    def simpan_barang(self, nama, kategori, kode, window):
+        if not nama or not kategori or not kode:
+            messagebox.showwarning("Peringatan", "Semua field harus diisi")
+            return
+
+        from database import insert_barang
+        insert_barang(nama, kategori, kode)
+
+        messagebox.showinfo("Sukses", "Barang berhasil ditambahkan")
+        window.destroy()
+        self.load_data_barang()
+
+    def hapus_barang(self):
+        selected = self.tableBarang.focus()
+
+        if not selected:
+            messagebox.showwarning("Peringatan", "Pilih barang terlebih dahulu")
+            return
+
+        values = self.tableBarang.item(selected, "values")
+
+        if not values:
+            messagebox.showerror("Error", "Data barang tidak valid")
+            return
+
+        kode_barang = values[2]
+
+        konfirmasi = messagebox.askyesno(
+        "Konfirmasi",
+        f"Yakin ingin menghapus barang dengan kode {kode_barang}?"
+    )
+
+        if not konfirmasi:
+            return
+
+        from database import delete_barang
+        delete_barang(kode_barang)
+
+        messagebox.showinfo("Sukses", "Barang berhasil dihapus")
+        self.load_data_barang()
 
 
-# ==========================================================
-# MAIN TKINTER
-# ==========================================================
 if __name__ == "__main__":
     root = Tk()
     app = MainApp(root)
