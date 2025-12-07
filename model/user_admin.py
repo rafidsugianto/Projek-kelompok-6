@@ -6,10 +6,6 @@ class DataUser:
         self.username_admin = username_admin
         self.password_admin = password_admin
      
-
-    # def add_history(self, msg):
-    #     self.history.append(msg)
-
     def insert_user(self):
         query = """
             INSERT INTO user_admin (username_admin, password_admin)
@@ -54,34 +50,4 @@ class UserRepo:
         self.db.cursor.execute(sql)
         return self.db.cursor.fetchall()
 
-    # def tambah_user(self, user: DataUser):
-    #     query = """
-    #         INSERT INTO datauser (no_rek, username_us, password_us, balance, role_us)
-    #         VALUES (%s, %s, %s, %s, %s)
-    #     """
-    #     values = (user.no_rek, user.username_us, user.password_us, user.balance, user.role_us)
-    #     self.db.cursor.execute(query, values)
-    #     self.db.mydb.commit()
-    #     print("User berhasil ditambahkan melalui UserRepository! Rek:", user.no_rek)
-      
-
-    # def update_balance(self, user: DataUser):
-    #     sql = "UPDATE datauser SET balance = %s WHERE username_us = %s"
-    #     values = (user.balance, user.username_us)
-    #     self.db.cursor.execute(sql, values)
-    #     self.db.mydb.commit()
-    #     print(f"Saldo user {user.username_us} berhasil diperbarui di database.")
-
-
-    # def save_history(self, username_us, description, amount):
-    #     times = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #     sql = "INSERT INTO history (username_us, description, amount, timestamp) VALUES (%s, %s, %s, %s)"
-    #     values = (username_us, description, amount, times)
-    #     self.db.cursor.execute(sql, values)
-    #     self.db.mydb.commit()
-
-
-    # def get_history(self, username_us):
-    #     sql = "SELECT description, amount, timestamp FROM history WHERE username_us=%s ORDER BY timestamp DESC"
-    #     self.db.cursor.execute(sql, (username_us,))
-    #     return self.db.cursor.fetchall()
+   
