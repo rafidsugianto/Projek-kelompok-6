@@ -8,7 +8,6 @@ def get_connection():
         database="database_toko"
     )
 
-
 def check_login(username_admin, password_admin):
     conn = get_connection()
     cursor = conn.cursor()
@@ -23,29 +22,34 @@ def check_login(username_admin, password_admin):
 
     return user
 
-
 def get_barang():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT nama_barang,kategori_barang, kode_barang FROM barang")
+    cursor.execute(
+        "SELECT nama_barang, kategori_barang, kode_barang, stok FROM barang"
+    )
+
     data = cursor.fetchall()
 
-    cursor.close()
     conn.close()
-
     return data
+
 
 def insert_barang(nama, kategori, kode):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO barang (nama_barang, kategori_barang, kode_barang) VALUES (%s,%s,%s)",
-        (nama, kategori, kode)
+        """
+        INSERT INTO barang (nama_barang, kategori_barang, kode_barang, stok)
+        VALUES (%s, %s, %s, %s)
+        """,
+        (nama, kategori, kode, 0)
     )
     conn.commit()
     cursor.close()
     conn.close()
+
 
 def delete_barang(kode_barang):
     conn = get_connection()
@@ -54,6 +58,24 @@ def delete_barang(kode_barang):
     query = "DELETE FROM barang WHERE kode_barang = %s"
     cursor.execute(query, (kode_barang,))
 
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def get_barang_low_stock():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nama_barang, kategori_barang, kode_barang, stok FROM barang WHERE stok < 5")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return data
+
+def update_stok(kode_barang, stok_baru):
+    conn = get_connection()
+    cursor = conn.cursor()
+    sql = "UPDATE barang SET stok = %s WHERE kode_barang = %s"
+    cursor.execute(sql, (stok_baru, kode_barang))
     conn.commit()
     cursor.close()
     conn.close()
