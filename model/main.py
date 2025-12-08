@@ -11,26 +11,50 @@ class MainApp:
         self.root.geometry("1000x700")
         self.login_screen()
 
+        style = ttk.Style()
+        style.configure("Title.TLabel", font=("Arial", 25, "bold"))
+        style.configure("Card.TFrame", background="Blue")
+        style.configure("TButton", font=("Arial", 12))
+        style.configure("TLabel", font=("Arial", 12))
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"))
+
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    # LOGIN SCREEN
     def login_screen(self):
         self.clear_window()
+        self.root.configure(bg="#f4f6f9")
 
-        ttk.Label(self.root, text="Username", font=("Arial", 14)).pack(pady=20)
-        self.entry_username = ttk.Entry(self.root, width=30)
-        self.entry_username.pack()
+        container = Frame(self.root, bg="#f4f6f9")
+        container.pack(expand=True, fill=BOTH)
 
-        ttk.Label(self.root, text="Password", font=("Arial", 14)).pack(pady=10)
-        self.entry_password = ttk.Entry(self.root, show="*", width=30)
-        self.entry_password.pack()
+        # kiri: title
+        left = Frame(container, bg="#f4f6f9")
+        left.pack(side=LEFT, expand=True, fill=BOTH, padx=80, pady=50)
 
-        ttk.Button(self.root,
-                   text="Login",
-                   width=20,
-                   command=self.proses_login).pack(pady=20)
+        ttk.Label(left, text="Data Inventory", style="Title.TLabel").pack(anchor="w")
+
+        # kanan: card login
+        right = Frame(container, bg="#f4f6f9")
+        right.pack(side=RIGHT, expand=True, fill=BOTH, padx=80, pady=50)
+
+        card = ttk.Frame(right, style="Card.TFrame")
+        card.pack(pady=20, ipadx=30, ipady=30)
+
+        ttk.Label(card, text="Login", font=("Arial", 16, "bold")).pack(pady=10)
+
+        ttk.Label(card, text="Username").pack(anchor="w", padx=20, pady=5)
+        self.entry_username = ttk.Entry(card, width=25)
+        self.entry_username.pack(padx=20, pady=5)
+
+        ttk.Label(card, text="Password").pack(anchor="w", padx=20, pady=5)
+        self.entry_password = ttk.Entry(card, show="*", width=25)
+        self.entry_password.pack(padx=20, pady=5)
+
+        ttk.Button(card, text="Login", width=20, command=self.proses_login).pack(pady=15)
+
+
 
     def proses_login(self):
         username = self.entry_username.get()
@@ -42,30 +66,20 @@ class MainApp:
         else:
             messagebox.showerror("Error", "Username atau password salah")
 
-    # DASHBOARD
     def admin_login(self):
         self.clear_window()
+        self.root.configure(bg="#f4f6f9")
 
-        ttk.Label(self.root, text="Dashboard Admin", font=("Arial", 18)).pack(pady=20)
+        frame = Frame(self.root, bg="#f4f6f9")
+        frame.pack(expand=True)
 
-        ttk.Button(self.root,
-                   text="Manajemen Stok",
-                   width=20,
-                   command=self.lihat_barang).pack(pady=10)
-        
-        ttk.Button(
-                   self.root,
-                   text="Data Barang",
-                   width=20,
-                   command=self.buka_data_barang).pack(pady=10)
-        
-        ttk.Button(self.root,
-                   text="Logout",
-                   width=20,
-                   command=self.login_screen).pack(pady=10)
+        ttk.Label(frame, text="Dashboard Admin", style="Title.TLabel").pack(pady=20)
+
+        ttk.Button(frame, text="Manajemen Stok", width=25, command=self.lihat_barang).pack(pady=8)
+        ttk.Button(frame, text="Data Barang", width=25, command=self.buka_data_barang).pack(pady=8)
+        ttk.Button(frame, text="Logout", width=25, command=self.login_screen).pack(pady=8)
 
 
-    # DATA BARANG
     def lihat_barang(self):
         self.clear_window()
 
@@ -92,8 +106,11 @@ class MainApp:
                    command=self.admin_login).pack(pady=10)
 
         # Table Container
-        container = Frame(self.root)
-        container.pack(fill=BOTH, expand=True, padx=20, pady=20)
+        table_card = ttk.Frame(self.root, style="Card.TFrame")
+        table_card.pack(fill=BOTH, expand=True, padx=40, pady=20)
+
+        container = Frame(table_card, bg="white")
+        container.pack(fill=BOTH, expand=True)
 
         scrollbar = ttk.Scrollbar(container, orient=VERTICAL)
 
@@ -161,7 +178,6 @@ class MainApp:
 
         self.load_data_barang()
 
-
     def load_data_barang(self):
         for row in self.tableBarang.get_children():
             self.tableBarang.delete(row)
@@ -176,10 +192,6 @@ class MainApp:
         for item in data:
             self.tableBarang.insert("", END, values=item)
 
-
-    # ==================
-    # TAMBAH BARANG
-    # ==================
     def form_add_barang(self):
         win = Toplevel(self.root)
         win.title("Tambah Barang")
@@ -218,9 +230,6 @@ class MainApp:
         window.destroy()
         self.load_data_barang()
 
-    # ==================
-    # HAPUS BARANG
-    # ==================
     def hapus_barang(self):
         selected = self.tableBarang.focus()
         if not selected:
@@ -238,8 +247,6 @@ class MainApp:
             messagebox.showinfo("Sukses", "Barang berhasil dihapus")
             self.load_data_barang()
 
-    
-    # TAMBAH STOK
     def tambah_stok(self):
         selected = self.tableBarang.focus()
         if not selected:
