@@ -1,115 +1,78 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-# Impor Entry standar dari tkinter untuk kontrol warna yang lebih baik
-from tkinter import Entry as TkEntry 
-from database import check_login, get_barang, insert_barang, delete_barang, update_stok 
+from database import check_login, get_barang, insert_barang, delete_barang, update_stok
 
 
 class MainApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Data Inventory - Navy Elegance")
-        self.root.geometry("1000x700")
+        self.root.title("Data Inventory")
+        self.root.geometry("1100x680")
+        self.root.configure(bg="#110CB2")
 
-        # --- Definisi Warna ---
-        self.NAVY_DEEP = "#001f3f"      
-        self.NAVY_ACCENT = "#1a4773"    
-        self.NAVY_DARK_FIELD = "#0d2c54" # Latar Belakang Input (Gelap)
-        self.HIGHLIGHT_BLUE = "#4a90e2" 
-        self.TEXT_LIGHT = "#f0f0f0"     
-        self.TEXT_WHITE = "#ffffff"     
-
-        # --- KONFIGURASI STYLE NAVY ELEGANCE (Ttk) ---
+        # Style UI
         style = ttk.Style()
-        
-        # Gaya Dasar (Root)
-        style.configure(".", background=self.NAVY_DEEP, foreground=self.TEXT_LIGHT) 
-        
-        # Gaya Judul Besar
-        style.configure("Title.TLabel", font=("Arial", 25, "bold"), 
-                        background=self.NAVY_DEEP, foreground=self.TEXT_WHITE)
-        
-        # Gaya Card
-        style.configure("Card.TFrame", background=self.NAVY_ACCENT) 
-        
-        # Gaya Tombol
-        style.configure("TButton", font=("Arial", 12), 
-                        background=self.HIGHLIGHT_BLUE, 
-                        foreground=self.TEXT_WHITE, 
-                        relief="raised") 
-        style.map("TButton", 
-                  background=[("active", "#3a80c2")]) 
+        style.theme_use("default")
 
-        # Gaya Label
-        style.configure("TLabel", font=("Arial", 12), 
-                        background=self.NAVY_DEEP, foreground=self.TEXT_LIGHT)
-        style.configure("Card.TLabel", font=("Arial", 12), 
-                        background=self.NAVY_ACCENT, foreground=self.TEXT_LIGHT)
-        
-        # Gaya Tabel
-        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), 
-                        background=self.NAVY_ACCENT, foreground=self.TEXT_WHITE)
-        style.configure("Treeview", 
-                        background=self.NAVY_DARK_FIELD, 
-                        fieldbackground=self.NAVY_DARK_FIELD, 
-                        foreground=self.TEXT_LIGHT,
-                        rowheight=25) 
-        style.map('Treeview', 
-                  background=[('selected', self.HIGHLIGHT_BLUE)],
-                  foreground=[('selected', self.TEXT_WHITE)])
-        # --- AKHIR KONFIGURASI STYLE ---
+        style.configure("TButton", font=("Arial", 11))
+        style.configure("TLabel", font=("Arial", 11))
+
+        # Table style
+        style.configure("Treeview",
+                        font=("Arial", 11),
+                        rowheight=28,
+                        background="white",
+                        foreground="black",
+                        fieldbackground="white")
+
+        style.configure("Treeview.Heading",
+                        font=("Arial", 12, "bold"),
+                        background="#00CED1",
+                        foreground="white")
+
+        style.layout("Treeview",
+                     [('Treeview.treearea', {'sticky': 'nswe'})])
+
+        # Title Style
+        style.configure("Title.TLabel", font=("Arial", 28, "bold"))
 
         self.login_screen()
 
+    # Clear Window
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
 
+    # ======================== LOGIN SCREEN ===========================
     def login_screen(self):
         self.clear_window()
-        
-        self.root.configure(bg=self.NAVY_DEEP)
 
-        container = Frame(self.root, bg=self.NAVY_DEEP)
+        container = Frame(self.root, bg="#f4f6f9")
         container.pack(expand=True, fill=BOTH)
 
-        # kiri: title
-        left = Frame(container, bg=self.NAVY_DEEP)
+        # Left Title
+        left = Frame(container, bg="#f4f6f9")
         left.pack(side=LEFT, expand=True, fill=BOTH, padx=80, pady=50)
 
         ttk.Label(left, text="Data Inventory", style="Title.TLabel").pack(anchor="w")
 
-        # kanan: card login
-        right = Frame(container, bg=self.NAVY_DEEP)
+        # Right Login Card
+        right = Frame(container, bg="#f4f6f9")
         right.pack(side=RIGHT, expand=True, fill=BOTH, padx=80, pady=50)
 
-        card = ttk.Frame(right, style="Card.TFrame") 
+        card = ttk.Frame(right)
         card.pack(pady=20, ipadx=30, ipady=30)
 
-        ttk.Label(card, text="Login", font=("Arial", 16, "bold"), 
-                  background=self.NAVY_ACCENT, foreground=self.TEXT_WHITE).pack(pady=10) 
+        ttk.Label(card, text="Login", font=("Arial", 16, "bold")).pack(pady=10)
 
-        # --- Bagian PENTING: Menggunakan tk.Entry (TkEntry) dengan Kontrol Warna Penuh ---
-        
-        # Username
-        ttk.Label(card, text="Username", style="Card.TLabel").pack(anchor="w", padx=20, pady=5)
-        self.entry_username = TkEntry(card, width=28, 
-                                      bg=self.NAVY_DARK_FIELD, 
-                                      fg=self.TEXT_WHITE, 
-                                      insertbackground=self.HIGHLIGHT_BLUE, # Warna kursor
-                                      relief=FLAT) # Flat border untuk tampilan modern
+        ttk.Label(card, text="Username").pack(anchor="w", padx=20, pady=5)
+        self.entry_username = ttk.Entry(card, width=25)
         self.entry_username.pack(padx=20, pady=5)
 
-        # Password
-        ttk.Label(card, text="Password", style="Card.TLabel").pack(anchor="w", padx=20, pady=5)
-        self.entry_password = TkEntry(card, show="*", width=28, 
-                                      bg=self.NAVY_DARK_FIELD, 
-                                      fg=self.TEXT_WHITE, 
-                                      insertbackground=self.HIGHLIGHT_BLUE,
-                                      relief=FLAT)
+        ttk.Label(card, text="Password").pack(anchor="w", padx=20, pady=5)
+        self.entry_password = ttk.Entry(card, show="*", width=25)
         self.entry_password.pack(padx=20, pady=5)
-        # --- Akhir Perbaikan Entry ---
 
         ttk.Button(card, text="Login", width=20, command=self.proses_login).pack(pady=15)
 
@@ -123,71 +86,91 @@ class MainApp:
         else:
             messagebox.showerror("Error", "Username atau password salah")
 
+    # =========================== ADMIN MENU ===========================
     def admin_login(self):
         self.clear_window()
-        # ... (Sama seperti sebelumnya)
-        self.root.configure(bg=self.NAVY_DEEP)
 
-        frame = Frame(self.root, bg=self.NAVY_DEEP)
+        frame = Frame(self.root, bg="#f4f6f9")
         frame.pack(expand=True)
 
         ttk.Label(frame, text="Dashboard Admin", style="Title.TLabel").pack(pady=20)
 
         ttk.Button(frame, text="Manajemen Stok", width=25, command=self.lihat_barang).pack(pady=8)
-        ttk.Button(frame, text="Data Barang", width=25, command=self.lihat_barang).pack(pady=8)
+        ttk.Button(frame, text="Data Barang", width=25, command=self.buka_data_barang).pack(pady=8)
         ttk.Button(frame, text="Logout", width=25, command=self.login_screen).pack(pady=8)
 
+    # ====================== HALAMAN DATA BARANG =======================
     def lihat_barang(self):
         self.clear_window()
-        # ... (Sama seperti sebelumnya)
-        self.root.configure(bg=self.NAVY_DEEP)
 
-        ttk.Label(self.root, text="Manajemen Barang", font=("Arial", 18), 
-                  background=self.NAVY_DEEP, foreground=self.TEXT_LIGHT).pack(pady=10)
+        container = Frame(self.root, bg="#f4f6f9")
+        container.pack(expand=True, fill=BOTH)
 
-        button_frame = Frame(self.root, bg=self.NAVY_DEEP)
-        button_frame.pack(pady=10)
+        # LEFT TABLE
+        left = Frame(container, bg="#f4f6f9")
+        left.pack(side=LEFT, expand=True, fill=BOTH, padx=25, pady=20)
 
-        ttk.Button(button_frame, text="Tambah Barang", width=20, command=self.form_add_barang).pack(side=LEFT, padx=5)
-        ttk.Button(button_frame, text="Tambah Stok", width=20, command=self.tambah_stok).pack(side=LEFT, padx=5)
-        ttk.Button(button_frame, text="Hapus Barang", width=20, command=self.hapus_barang).pack(side=LEFT, padx=5)
-        
-        ttk.Button(self.root, text="← Kembali", width=20, command=self.admin_login).pack(pady=10)
+        ttk.Label(left, text="Manajemen Barang",
+                  font=("Arial", 20, "bold")).pack(pady=10)
 
-        table_card = ttk.Frame(self.root, style="Card.TFrame") 
-        table_card.pack(fill=BOTH, expand=True, padx=40, pady=20)
+        table_card = ttk.Frame(left)
+        table_card.pack(fill=BOTH, expand=True)
 
-        container = Frame(table_card, bg=self.NAVY_DARK_FIELD)
-        container.pack(fill=BOTH, expand=True)
-
-        scrollbar = ttk.Scrollbar(container, orient=VERTICAL)
+        scrollbar = ttk.Scrollbar(table_card, orient=VERTICAL)
 
         self.tableBarang = ttk.Treeview(
-            container,
+            table_card,
             columns=("nama_barang", "kategori_barang", "kode_barang", "stok"),
-            show="headings",
-            yscrollcommand=scrollbar.set
+            show="headings"
         )
 
         scrollbar.config(command=self.tableBarang.yview)
         scrollbar.pack(side=RIGHT, fill=Y)
 
+        # HEADER
         self.tableBarang.heading("nama_barang", text="Nama")
         self.tableBarang.heading("kategori_barang", text="Kategori")
         self.tableBarang.heading("kode_barang", text="Kode")
         self.tableBarang.heading("stok", text="Stok")
 
+        # COLUMN WIDTH
         self.tableBarang.column("nama_barang", width=250)
-        self.tableBarang.column("kategori_barang", width=100, anchor="center")
-        self.tableBarang.column("kode_barang", width=150, anchor="center")
+        self.tableBarang.column("kategori_barang", width=120, anchor="center")
+        self.tableBarang.column("kode_barang", width=120, anchor="center")
         self.tableBarang.column("stok", width=80, anchor="center")
 
-        self.tableBarang.pack(side=LEFT, fill=BOTH, expand=True)
+        self.tableBarang.pack(fill=BOTH, expand=True)
+
+        # RIGHT ACTION PANEL
+        right = Frame(container, bg="white")
+        right.pack(side=RIGHT, fill=Y, padx=10, pady=20)
+
+        ttk.Label(right, text="Actions",
+                  font=("Arial", 18, "bold")).pack(pady=15)
+
+        ttk.Button(right, text="Tambah Barang",
+                   width=20,
+                   command=self.form_add_barang).pack(pady=8)
+
+        ttk.Button(right, text="Tambah Stok",
+                   width=20,
+                   command=self.tambah_stok).pack(pady=8)
+
+        ttk.Button(right, text="Hapus Barang",
+                   width=20,
+                   command=self.hapus_barang).pack(pady=8)
+
+        ttk.Button(right, text="← Kembali",
+                   width=20,
+                   command=self.admin_login).pack(side=BOTTOM, pady=15)
 
         self.load_data_barang()
 
+    def buka_data_barang(self):
+        self.lihat_barang()
+
+    # ===================== LOAD DATA TABLE ==========================
     def load_data_barang(self):
-        # ... (Sama seperti sebelumnya)
         for row in self.tableBarang.get_children():
             self.tableBarang.delete(row)
 
@@ -199,126 +182,121 @@ class MainApp:
         for item in data:
             self.tableBarang.insert("", END, values=item)
 
+    # ====================== POPUP TAMBAH BARANG ======================
     def form_add_barang(self):
-        
         win = Toplevel(self.root)
         win.title("Tambah Barang")
-        win.geometry("350x300")
-        win.configure(bg=self.NAVY_ACCENT)
+        win.geometry("400x320")
+        win.configure(bg="white")
 
-        ttk.Label(win, text="Nama Barang", style="Card.TLabel").pack(pady=5)
-        # Entry standar dengan warna eksplisit
-        entry_nama = TkEntry(win, width=28, bg=self.NAVY_DARK_FIELD, fg=self.TEXT_WHITE, insertbackground=self.HIGHLIGHT_BLUE, relief=FLAT)
-        entry_nama.pack()
+        ttk.Label(win, text="Tambah Barang",
+                  font=("Arial", 16, "bold")).pack(pady=10)
 
-        ttk.Label(win, text="Kategori", style="Card.TLabel").pack(pady=5)
-        # Entry standar dengan warna eksplisit
-        entry_kategori = TkEntry(win, width=28, bg=self.NAVY_DARK_FIELD, fg=self.TEXT_WHITE, insertbackground=self.HIGHLIGHT_BLUE, relief=FLAT)
-        entry_kategori.pack()
+        frame = ttk.Frame(win)
+        frame.pack(pady=10)
 
-        ttk.Label(win, text="Kode Barang", style="Card.TLabel").pack(pady=5)
-        # Entry standar dengan warna eksplisit
-        entry_kode = TkEntry(win, width=28, bg=self.NAVY_DARK_FIELD, fg=self.TEXT_WHITE, insertbackground=self.HIGHLIGHT_BLUE, relief=FLAT)
-        entry_kode.pack()
+        ttk.Label(frame, text="Nama Barang").grid(row=0, column=0, pady=5, sticky="w")
+        entry_nama = ttk.Entry(frame, width=30)
+        entry_nama.grid(row=0, column=1, pady=5)
 
-        ttk.Button(
-            win,
-            text="Simpan",
-            command=lambda: self.simpan_barang(
-                entry_nama.get(),
-                entry_kategori.get(),
-                entry_kode.get(),
-                win
-            )
-        ).pack(pady=20)
+        ttk.Label(frame, text="Kategori").grid(row=1, column=0, pady=5, sticky="w")
+        entry_kategori = ttk.Entry(frame, width=30)
+        entry_kategori.grid(row=1, column=1, pady=5)
 
-    def simpan_barang(self, nama, kategori, kode, window):
-        # ... (Sama seperti sebelumnya)
-        if not nama or not kategori or not kode:
-            messagebox.showwarning("Peringatan", "Semua field harus diisi")
-            return
+        ttk.Label(frame, text="Kode Barang").grid(row=2, column=0, pady=5, sticky="w")
+        entry_kode = ttk.Entry(frame, width=30)
+        entry_kode.grid(row=2, column=1, pady=5)
 
-        insert_barang(nama, kategori, kode)
-        messagebox.showinfo("Sukses", "Barang berhasil ditambahkan")
-        window.destroy()
-        self.load_data_barang()
+        def simpan():
+            nama = entry_nama.get()
+            kategori = entry_kategori.get()
+            kode = entry_kode.get()
 
+            if not nama or not kategori or not kode:
+                messagebox.showwarning("Peringatan", "Semua field harus diisi")
+                return
+
+            insert_barang(nama, kategori, kode)
+            messagebox.showinfo("Sukses", "Barang berhasil ditambahkan")
+            win.destroy()
+            self.load_data_barang()
+
+        ttk.Button(win, text="Simpan", command=simpan).pack(pady=20)
+
+    # ========================== HAPUS BARANG ==========================
     def hapus_barang(self):
-        # ... (Sama seperti sebelumnya)
         selected = self.tableBarang.focus()
         if not selected:
             messagebox.showwarning("Peringatan", "Pilih barang terlebih dahulu")
             return
 
         values = self.tableBarang.item(selected, "values")
-        kode_barang = values[2] 
+        kode_barang = values[2]
 
         if messagebox.askyesno(
                 "Konfirmasi",
-                f"Yakin ingin menghapus barang: {values[0]} (Kode: {kode_barang})?"):
+                f"Yakin ingin menghapus barang dengan kode {kode_barang}?"):
 
             delete_barang(kode_barang)
             messagebox.showinfo("Sukses", "Barang berhasil dihapus")
             self.load_data_barang()
 
+    # ======================== POPUP TAMBAH STOK ======================
     def tambah_stok(self):
-        # ... (Sama seperti sebelumnya)
         selected = self.tableBarang.focus()
         if not selected:
             messagebox.showwarning("Warning", "Pilih barang dulu!")
             return
 
         values = self.tableBarang.item(selected, "values")
+
         nama = values[0]
         kode_barang = values[2]
-        
-        try:
-            stok = int(values[3])
-        except (ValueError, IndexError):
-            stok = 0 
+        stok = int(values[3])
 
+        # --- Popup Modern ---
         popup = Toplevel(self.root)
         popup.title("Tambah Stok")
-        popup.geometry("300x230")
-        popup.configure(bg=self.NAVY_ACCENT)
+        popup.geometry("350x250")
+        popup.configure(bg="white")
 
-        ttk.Label(popup, text="Nama Barang", style="Card.TLabel").pack(pady=5)
-        ttk.Label(popup, text=nama, background=self.NAVY_ACCENT, foreground=self.TEXT_WHITE, font=("Arial", 12, "bold")).pack()
+        ttk.Label(
+            popup, text="Tambah Stok",
+            font=("Arial", 16, "bold")
+        ).pack(pady=10)
 
-        ttk.Label(popup, text="Stok Sekarang", style="Card.TLabel").pack(pady=5)
-        ttk.Label(popup, text=str(stok), background=self.NAVY_ACCENT, foreground=self.TEXT_WHITE, font=("Arial", 12, "bold")).pack()
+        frame = ttk.Frame(popup, padding=10)
+        frame.pack()
 
-        ttk.Label(popup, text="Tambah Stok", style="Card.TLabel").pack(pady=5)
-        # Entry standar dengan warna eksplisit
-        entry_tambah = TkEntry(popup, width=28, bg=self.NAVY_DARK_FIELD, fg=self.TEXT_WHITE, insertbackground=self.HIGHLIGHT_BLUE, relief=FLAT)
-        entry_tambah.pack()
+        ttk.Label(frame, text="Nama Barang").grid(row=0, column=0, sticky="w", pady=5)
+        ttk.Label(frame, text=nama, font=("Arial", 12, "bold")).grid(row=0, column=1, sticky="w", pady=5)
+
+        ttk.Label(frame, text="Stok Sekarang").grid(row=1, column=0, sticky="w", pady=5)
+        ttk.Label(frame, text=str(stok)).grid(row=1, column=1, sticky="w", pady=5)
+
+        ttk.Label(frame, text="Tambah Stok").grid(row=2, column=0, sticky="w", pady=5)
+        entry_tambah = ttk.Entry(frame, width=10)
+        entry_tambah.grid(row=2, column=1, sticky="w", pady=5)
 
         def simpan():
-            tambah_str = entry_tambah.get()
-            if tambah_str == "":
+            tambah = entry_tambah.get()
+            if tambah == "":
                 messagebox.showwarning("Warning", "Masukkan jumlah stok")
                 return
             try:
-                tambah = int(tambah_str)
+                tambah = int(tambah)
             except ValueError:
                 messagebox.showerror("Error", "Input harus angka!")
                 return
-            
-            if tambah < 1:
-                 messagebox.showwarning("Warning", "Jumlah stok harus positif")
-                 return
-
 
             stok_baru = stok + tambah
             update_stok(kode_barang, stok_baru)
             messagebox.showinfo("Sukses", "Stok berhasil ditambah!")
             popup.destroy()
-            self.load_data_barang()
+            self.lihat_barang()
 
         ttk.Button(popup, text="Simpan", command=simpan).pack(pady=10)
-    
-    def buka_data_barang(self):
-        self.lihat_barang()
+
 
 if __name__ == "__main__":
     root = Tk()
