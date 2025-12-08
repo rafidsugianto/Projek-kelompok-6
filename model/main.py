@@ -167,7 +167,46 @@ class MainApp:
         self.load_data_barang()
 
     def buka_data_barang(self):
-        self.lihat_barang()
+        self.clear_window()
+
+        container = Frame(self.root, bg="#f4f6f9")
+        container.pack(expand=True, fill=BOTH)
+
+        ttk.Label(container, text="Data Barang",
+                font=("Arial", 20, "bold")).pack(pady=10)
+
+        table_card = ttk.Frame(container)
+        table_card.pack(fill=BOTH, expand=True)
+
+        scrollbar = ttk.Scrollbar(table_card, orient=VERTICAL)
+
+        self.tableBarang = ttk.Treeview(
+            table_card,
+            columns=("nama_barang", "kategori_barang", "kode_barang", "stok"),
+            show="headings"
+        )
+
+        scrollbar.config(command=self.tableBarang.yview)
+        scrollbar.pack(side=RIGHT, fill=Y)
+
+        # HEADER
+        self.tableBarang.heading("nama_barang", text="Nama")
+        self.tableBarang.heading("kategori_barang", text="Kategori")
+        self.tableBarang.heading("kode_barang", text="Kode")
+        self.tableBarang.heading("stok", text="Stok")
+
+        # WIDTH
+        self.tableBarang.column("nama_barang", width=250)
+        self.tableBarang.column("kategori_barang", width=120)
+        self.tableBarang.column("kode_barang", width=120)
+        self.tableBarang.column("stok", width=80)
+
+        self.tableBarang.pack(fill=BOTH, expand=True)
+
+        ttk.Button(container, text="← Kembali",
+                command=self.admin_login).pack(pady=15)
+
+        self.load_data_barang()
 
     # ===================== LOAD DATA TABLE ==========================
     def load_data_barang(self):
